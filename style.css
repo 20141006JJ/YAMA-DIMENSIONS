@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+body {
+  margin: 0; padding: 0; background-color: #020203; color: #e2e8f0;
+  font-family: 'Orbitron', system-ui, sans-serif;
+  display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden;
+}
+
+.triple-a-container {
+  position: relative; width: 1240px; height: 840px; background: #07080d;
+  border: 2px solid #141726; box-shadow: 0 0 50px rgba(0,0,0,0.9);
+  display: flex; flex-direction: column; overflow: hidden; border-radius: 8px;
+}
+
+.hidden { display: none !important; }
+
+/* 殘血紅光 */
+.vignette-danger {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  box-shadow: inset 0 0 100px rgba(255, 23, 68, 0.9);
+  pointer-events: none; z-index: 99; animation: pulseVignette 1.5s infinite ease-in-out;
+}
+@keyframes pulseVignette { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.9; } }
+
+/* 主畫面與選單 */
+.menu-overlay {
+  position: absolute; width: 100%; height: 100%;
+  background: radial-gradient(circle at center, #0f1222 0%, #020305 100%);
+  display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 40px; z-index: 100;
+}
+.game-title {
+  font-size: 64px; font-weight: 900; margin: 0; letter-spacing: 10px;
+  background: linear-gradient(45deg, #00e5ff, #d500f9, #ff9100); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.game-subtitle { color: #64748b; letter-spacing: 2px; font-size: 13px; text-align: center; }
+
+.btn-aaa {
+  padding: 14px 35px; font-size: 15px; font-weight: bold; font-family: 'Orbitron';
+  background: linear-gradient(90deg, #00b0ff, #00e676); color: #000; border: none;
+  cursor: pointer; border-radius: 4px; transition: 0.2s; margin: 8px;
+}
+.btn-aaa:hover { filter: brightness(1.2); transform: translateY(-1px); }
+.btn-secondary { background: #1e293b; color: #fff; }
+
+/* HUD 介面 */
+.hud-top-bar {
+  display: flex; justify-content: space-around; background: #0b0c12; padding: 12px; border-bottom: 2px solid #141726;
+}
+.hud-item { font-size: 13px; color: #94a3b8; }
+.glow-text { color: #00e5ff; font-weight: bold; }
+
+/* 維度傳送切換紐 */
+.dimension-teleporters {
+  display: flex; justify-content: center; gap: 10px; background: #0f111a; padding: 6px;
+}
+.dimension-teleporters button {
+  background: #1e293b; border: 1px solid #334155; color: #cbd5e1; padding: 4px 12px;
+  font-family: 'Orbitron'; font-size: 11px; border-radius: 4px; cursor: pointer;
+}
+.dimension-teleporters button:hover { background: #0284c7; color: white; }
+
+/* 閻王大血條 */
+.boss-hud-bar { background: rgba(15, 0, 5, 0.9); padding: 8px 40px; border-bottom: 2px solid #ff1744; }
+.boss-info { font-size: 12px; color: #ff5252; text-align: center; font-weight: bold; margin-bottom: 4px; }
+.boss-bar-frame { width: 100%; height: 8px; background: #1a050a; border-radius: 4px; overflow: hidden; }
+.boss-bar-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #ff1744, #7a0010); }
+
+/* 核心主版面與大 Canvas */
+.game-main-layout { display: flex; flex: 1; justify-content: center; background: #040406; padding: 10px 0; }
+.canvas-viewport { position: relative; width: 900px; height: 600px; box-shadow: 0 0 30px rgba(0,0,0,0.8); border: 2px solid #1e293b; }
+canvas { width: 100%; height: 100%; background: #020203; display: block; }
+
+/* 提示標籤 */
+.interaction-hint {
+  position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,0.85); border: 1px solid #ff9100; color: #ff9100;
+  padding: 8px 20px; font-size: 13px; font-weight: bold; border-radius: 4px; animation: pulse 1s infinite alternate;
+}
+
+/* 底部操作面板 */
+.bottom-action-bar {
+  display: flex; justify-content: center; align-items: center; gap: 20px;
+  background: #0b0c12; padding: 15px; border-top: 2px solid #141726;
+}
+.btn-panel-action { background: #1e293b; border: 1px solid #334155; color: #cbd5e1; padding: 10px 24px; cursor: pointer; font-family: 'Orbitron'; font-size: 12px; border-radius: 4px; }
+.btn-craft { background: linear-gradient(135deg, #0284c7, #0369a1); color: white; font-weight: bold; border: none; }
+.btn-quit { background: #991b1b; border: none; color: white; }
+
+/* ==========================================
+ * 類似 Minecraft (MC) 雙向背包風格 UI
+ * ========================================== */
+.mc-style-popup {
+  position: absolute; top: 15%; left: 15%; width: 70%; height: 65%;
+  background: #c6c6c6; border: 4px solid #3c3c3c; box-shadow: inset -4px -4px #555, inset 4px 4px #fff;
+  padding: 20px; z-index: 300; font-family: sans-serif; color: #000; box-sizing: border-box;
+}
+.mc-header { font-family: 'Orbitron'; font-weight: bold; font-size: 16px; margin-bottom: 15px; border-bottom: 2px solid #555; padding-bottom: 5px; }
+.mc-layout { display: flex; gap: 20px; height: calc(100% - 60px); }
+.mc-section { flex: 1; background: #8b8b8b; border: 3px solid #373737; padding: 12px; display: flex; flex-direction: column; overflow-y: auto; }
+.section-title { font-weight: bold; margin-bottom: 10px; color: #fff; text-shadow: 1px 1px #000; font-size: 13px; }
+.stat-row { font-size: 12px; margin-bottom: 4px; font-weight: bold; }
+
+.mc-equip-slots { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.mc-slot {
+  display: flex; align-items: center; gap: 15px; background: #8b8b8b;
+  border: 3px solid #3c3c3c; box-shadow: inset -3px -3px #fff, inset 3px 3px #555;
+  padding: 8px; cursor: pointer;
+}
+.mc-slot:hover { background: #9c9c9c; }
+.slot-label { font-size: 11px; color: #ddd; font-weight: bold; width: 40px; }
+.slot-item-icon { font-size: 20px; }
+.slot-item-name { font-size: 12px; font-weight: bold; color: #000; }
+
+.mc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 15px; }
+.mc-grid-item { background: #8b8b8b; border: 2px solid #373737; padding: 6px; font-size: 12px; font-weight: bold; box-shadow: inset -2px -2px #fff, inset 2px 2px #555; }
+
+.craft-forge-title { margin-top: auto; font-weight: bold; font-size: 12px; color: #ffeb3b; text-shadow: 1px 1px #000; padding-top: 5px; }
+.mc-craft-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; background: #707070; padding: 4px 8px; margin-top: 4px; border: 1px solid #333; }
+.mc-craft-row button { background: #55aa55; color: white; border: 2px solid #225522; padding: 2px 8px; cursor: pointer; font-size: 11px; }
+
+.btn-close-mc { background: #a9a9a9; border: 3px solid #555; padding: 6px 16px; cursor: pointer; font-weight: bold; position: absolute; bottom: 15px; right: 20px; }
+
+/* ==========================================
+ * 類似《三角洲行動》物資搜刮 UI
+ * ========================================== */
+.delta-loot-window {
+  position: absolute; top: 30%; left: 35%; width: 400px;
+  background: rgba(10, 14, 23, 0.96); border: 2px solid #ff9100;
+  box-shadow: 0 0 30px rgba(255,145,0,0.4); padding: 16px; z-index: 350; border-radius: 4px;
+}
+.loot-title { font-size: 14px; font-weight: bold; color: #ff9100; margin-bottom: 4px; }
+.loot-subtitle { font-size: 10px; color: #64748b; letter-spacing: 1px; margin-bottom: 12px; }
+.loot-list { display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto; }
+.loot-row {
+  display: flex; justify-content: space-between; align-items: center;
+  background: #161b26; border-left: 3px solid #ff9100; padding: 8px 12px; font-size: 12px;
+}
+.btn-loot-action { background: #ff9100; color: #000; font-weight: bold; border: none; padding: 2px 8px; cursor: pointer; font-size: 11px; border-radius: 2px; }
+.btn-loot-all { background: #00e676; border: none; padding: 6px 12px; font-family: 'Orbitron'; font-size: 11px; font-weight: bold; cursor: pointer; }
+.btn-loot-close { background: #475569; color: white; border: none; padding: 6px 12px; font-family: 'Orbitron'; font-size: 11px; margin-left: 10px; cursor: pointer; }
+
+/* 基礎設定 */
+.glass-popup { position: absolute; top: 25%; left: 35%; width: 400px; background: #0f111a; border: 2px solid #1e293b; padding: 20px; z-index: 400; }
+.popup-title { color: #00e5ff; font-size: 15px; margin-bottom: 10px; }
+.settings-grid { display: flex; flex-direction: column; gap: 6px; }
+.setting-row { display: flex; justify-content: space-between; font-size: 12px; background: #161925; padding: 6px; }
+.setting-row button { background: #334155; color: #00e5ff; border: none; padding: 2px 10px; cursor: pointer; }
+.btn-close { background: #475569; color: white; border: none; padding: 4px 10px; margin-top: 10px; float: right; cursor: pointer; }
+.death-overlay { position: absolute; width: 100%; height: 100%; background: rgba(20,0,0,0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 999; }
+.glitch-title { font-size: 36px; color: #ff1744; font-weight: bold; margin-bottom: 20px; }
