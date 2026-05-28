@@ -1,161 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Quantum Engine 7.0 Ultima</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-  <head>
-    <meta charset="UTF-8">
-    <title>Untitled</title>
-    <link rel="stylesheet" href="./style.css">
+<div class="game-universe">
+  <div id="danger-vignette" class="vignette-fx"></div>
+  <div class="scanlines"></div>
 
-  </head>
+  <div id="ui-main-menu" class="overlay-screen">
+    <h1 class="glitch-text">QUANTUM 7.0</h1>
+    <p style="color:#00f0ff; font-size:12px; margin-top:-10px;">ULTIMA EDITION · 雙平台極致版</p>
     
-  <body>
-  <div class="triple-a-container">
-  
-  <!-- 殘血全息紅光濾鏡 -->
-  <div id="low-hp-vignette" class="vignette-danger hidden"></div>
+    <div class="lobby-container">
+      
+      <div class="menu-panel">
+        <div class="input-row">
+          <span style="color:#94a3b8; font-size:12px;">我的 ID</span>
+          <input type="text" id="input-name" value="量子遊俠" />
+        </div>
+        <div class="input-row">
+          <span style="color:#94a3b8; font-size:12px;">連線房號</span>
+          <input type="text" id="input-room" value="ROOM_777" />
+        </div>
+        <button class="btn-core mode-device" id="btn-toggle-device" onclick="Engine.toggleDevice()">📱 目前：PC 鍵盤 (點擊切換手機)</button>
+        <hr style="border-color:#1e293b; width:100%; margin:5px 0;">
+        
+        <div class="mode-grid">
+          <button class="btn-core mode-training" onclick="Engine.launch('TRAINING')">🎯 虛擬靶場 (訓練)</button>
+          <button class="btn-core mode-public" onclick="Engine.launch('PUBLIC')">🌍 線上大廳 (PVE)</button>
+          <button class="btn-core mode-pvp" onclick="Engine.launch('PVP')">⚔️ 跨服死鬥 (匹配)</button>
+          <button class="btn-core mode-ranked" onclick="Engine.launch('RANKED')">🏆 積分排位賽 (S1賽季)</button>
+        </div>
+      </div>
 
-  <!-- 1. 主選單 -->
-  <div id="menu-screen" class="menu-overlay">
-    <div class="menu-bg-effect"></div>
-    <div class="title-container">
-      <h1 class="game-title">YAMA: DIMENSIONS</h1>
-      <p class="game-subtitle">四大維度重構：天空、地上、地底與冥界城堡</p>
-    </div>
-    <div class="menu-actions">
-      <button class="btn-aaa pulse" onclick="startGame()">⚡ 進入多維度冒險</button>
-      <button class="btn-aaa btn-secondary" onclick="triggerLoadGame()">💾 載入時空存檔</button>
-      <button class="btn-aaa btn-secondary" onclick="toggleMenuPanel('settings-popup')">⚙️ 控制按鍵綁定</button>
+      <div class="friends-panel">
+        <div class="friends-header">🌐 NETWORK / 聯絡人</div>
+        <div class="friends-list">
+          <div class="friend-row"><span class="dot online"></span><span class="name">霓虹刺客_99</span><button class="btn-invite">邀請</button></div>
+          <div class="friend-row"><span class="dot online"></span><span class="name">NightCity_AK</span><button class="btn-invite">邀請</button></div>
+          <div class="friend-row"><span class="dot in-game"></span><span class="name">量子狂熱者</span><span class="status-text">戰鬥中</span></div>
+          <div class="friend-row"><span class="dot in-game"></span><span class="name">Zero_Bug</span><span class="status-text">匹配中</span></div>
+          <div class="friend-row"><span class="dot offline"></span><span class="name">Glitch_Cat</span><span class="status-text">離線</span></div>
+          <div class="friend-row"><span class="dot offline"></span><span class="name">系統管理員</span><span class="status-text">離線</span></div>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <!-- 2. 遊戲主畫面 -->
-  <div id="game-screen" class="hidden">
-    
-    <!-- 頂部 HUD -->
-    <div class="hud-top-bar">
-      <div class="hud-item"><span class="icon">🌍</span> 當前維度: <span id="lbl-dimension-text" class="glow-text">地上世界(平原)</span></div>
-      <div class="hud-item"><span class="icon">🧭</span> 座標: <span id="lbl-coords" class="glow-text">X: 0, Y: 0</span></div>
-      <div class="hud-item"><span class="icon">💀</span> 閻王討伐數: <span id="lbl-boss-kill-count" class="glow-text">0</span></div>
-      <div class="hud-item"><span class="icon">⏰</span> 時空計: <span id="lbl-time-clock" class="glow-text">12:00</span></div>
+  <div id="ui-overlay-mask" class="center-overlay hidden">
+    <div id="txt-overlay-msg" class="countdown-text">READY</div>
+  </div>
+
+  <div id="ui-game-viewport" class="hidden">
+    <div class="hud-top">
+      <div class="hud-block">房號: <span id="hud-room">---</span></div>
+      <div class="hud-block">玩家: <span id="hud-name">---</span></div>
+      <div class="hud-block">座標: <span id="hud-pos">X:0 Y:0</span></div>
+      <div class="hud-block">戰績: <span id="hud-kda" style="color:#f59e0b;">0 殺 / 0 死</span></div>
+      <button onclick="Engine.exitGame()" style="background:#ef4444; border:none; color:#fff; border-radius:3px; cursor:pointer; padding: 2px 10px;">🚪 退出</button>
     </div>
 
-    <!-- 閻王 Boss 血條 -->
-    <div id="boss-hp-container" class="boss-hud-bar hidden">
-      <div class="boss-info">👹 【冥界至尊】閻王 <span id="lbl-boss-hp-text">1200/1200</span></div>
-      <div class="boss-bar-frame"><div id="boss-hp-fill" class="boss-bar-fill"></div></div>
+    <div class="player-vital-panel">
+      <div class="vital-row"><span style="font-size:10px; color:#fff; width:20px;">HP</span><div class="bar-frame"><div id="bar-hp" class="bar-fill hp-fill"></div></div></div>
+      <div class="vital-row"><span style="font-size:10px; color:#fff; width:20px;">MP</span><div class="bar-frame"><div id="bar-mp" class="bar-fill mp-fill"></div></div></div>
     </div>
 
-    <!-- 維度傳送快捷鍵提示（方便測試四大地圖） -->
-    <div class="dimension-teleporters">
-      <button onclick="teleportToDimension('surface')">🚀 地上世界</button>
-      <button onclick="teleportToDimension('sky')">☁️ 天空島嶼</button>
-      <button onclick="teleportToDimension('underground')">🌋 地底礦坑</button>
-      <button onclick="teleportToDimension('yama')">🏰 閻王城堡</button>
-    </div>
-
-    <div class="game-main-layout">
-      <!-- 中央：放大版主要畫布 -->
-      <div class="canvas-viewport">
-        <canvas id="world-canvas"></canvas>
-        <div id="interaction-prompt" class="interaction-hint hidden">按 [Y] 搜刮物資寶箱</div>
+    <div class="main-battlefield">
+      <canvas id="gameCanvas"></canvas>
+      
+      <div id="mobile-ui" class="hidden">
+        <div class="joystick-zone" id="joy-zone"><div class="joystick-knob" id="joy-knob"></div></div>
+        <div class="action-zone">
+          <div class="btn-mobile-action" ontouchstart="Engine.cast('Q')">Q<br><span style="font-size:8px;">火球</span><div class="cd-overlay" id="mcd-q"></div></div>
+          <div class="btn-mobile-action" ontouchstart="Engine.cast('E')">E<br><span style="font-size:8px;">旋風</span><div class="cd-overlay" id="mcd-e"></div></div>
+          <div class="btn-mobile-action" ontouchstart="Engine.cast('Shift')" style="border-color:#10b981;">閃<br><span style="font-size:8px;">位移</span><div class="cd-overlay" id="mcd-shift"></div></div>
+          <div class="btn-mobile-action atk" ontouchstart="Engine.attack()">⚔️<br><span style="font-size:10px;">攻擊</span></div>
+        </div>
       </div>
     </div>
 
-    <!-- 底部快捷功能欄 -->
-    <div class="bottom-action-bar">
-      <button class="btn-panel-action btn-craft" onclick="toggleInventoryUI()">🎒 開啟 MC 角色背包與裝備欄 [B]</button>
-      <button class="btn-panel-action" onclick="triggerSaveGame()">💾 快速儲存</button>
-      <button class="btn-panel-action btn-quit" onclick="returnToMainMenu()">🚪 退出至主畫面</button>
+    <div id="pc-footer" class="pc-footer hidden">
+      <div class="skill-slot"><span class="key-cap">Space</span> ⚔️ 普攻斬擊</div>
+      <div class="skill-slot"><span class="key-cap">Q</span> 🔥 火球 <div class="cd-overlay" id="pcd-q"></div></div>
+      <div class="skill-slot"><span class="key-cap">E</span> 🌌 旋風斬 <div class="cd-overlay" id="pcd-e"></div></div>
+      <div class="skill-slot" style="border-color:#10b981;"><span class="key-cap" style="background:#10b981;">Shift</span> ⚡ 閃現 <div class="cd-overlay" id="pcd-shift"></div></div>
     </div>
   </div>
-
-  <!-- 3. 類似 Minecraft (MC) 的背包與裝備欄 UI -->
-  <div id="mc-inventory-popup" class="mc-style-popup hidden">
-    <div class="mc-header">🎒 TRAVELER MATRIX (角色與背包)</div>
-    <div class="mc-layout">
-      <!-- 左側：裝備欄 slots -->
-      <div class="mc-section">
-        <div class="section-title">🛡️ 裝備狀態</div>
-        <div class="stat-row">生命值: <span id="mc-stat-hp">100/100</span></div>
-        <div class="stat-row">攻擊力: <span id="mc-stat-atk">15</span></div>
-        <div class="mc-equip-slots">
-          <div class="mc-slot" onclick="unequipGear('weapon')">
-            <span class="slot-label">武器</span>
-            <div id="slot-weapon-icon" class="slot-item-icon">🪵</div>
-            <div id="slot-weapon-name" class="slot-item-name">基礎木刃</div>
-          </div>
-          <div class="mc-slot" onclick="unequipGear('armor')">
-            <span class="slot-label">護甲</span>
-            <div id="slot-armor-icon" class="slot-item-icon">🦺</div>
-            <div id="slot-armor-name" class="slot-item-name">布質外衣</div>
-          </div>
-        </div>
-      </div>
-      <!-- 右側：背包與素材 -->
-      <div class="mc-section">
-        <div class="section-title">📦 儲存倉庫 (點擊武器/防具可進行裝備)</div>
-        <div class="mc-grid">
-          <div class="mc-grid-item">🪵 木源質: <span id="mc-cnt-wood">0</span></div>
-          <div class="mc-grid-item">🪨 碎星岩: <span id="mc-cnt-stone">0</span></div>
-          <div class="mc-grid-item">🔩 聚合鐵: <span id="mc-cnt-iron">0</span></div>
-          <div class="mc-grid-item">🪙 精煉金: <span id="mc-cnt-gold">0</span></div>
-          <div class="mc-grid-item">💎 秩序鑽: <span id="mc-cnt-diamond">0</span></div>
-          <div class="mc-grid-item">🔥 烈焰晶: <span id="mc-cnt-coal">0</span></div>
-        </div>
-        <div class="craft-forge-title">🛠️ 分子重組鍛造</div>
-        <div class="mc-craft-row">
-          <span>鋼鐵合金刃 (10鐵+5岩)</span>
-          <button onclick="craftGear('iron_sword')">製作並裝備</button>
-        </div>
-        <div class="mc-craft-row">
-          <span>聚合星耀刃 (15金+5鑽)</span>
-          <button onclick="craftGear('gold_sword')">製作並裝備</button>
-        </div>
-        <div class="mc-craft-row">
-          <span>納米防護輕甲 (10鐵+20木)</span>
-          <button onclick="craftGear('iron_armor')">製作並裝備</button>
-        </div>
-      </div>
-    </div>
-    <button class="btn-close-mc" onclick="toggleInventoryUI()">關閉背包</button>
-  </div>
-
-  <!-- 4. 類似《三角洲行動》的 Y 鍵開箱搜刮 UI -->
-  <div id="delta-loot-popup" class="delta-loot-window hidden">
-    <div class="loot-title">📂 正在搜刮：物資前線寶箱</div>
-    <div class="loot-subtitle">DELTA SEARCHING... 偵測到艙內有高分子素材</div>
-    <div id="loot-items-container" class="loot-list">
-      <!-- 動態插入內容 -->
-    </div>
-    <div style="text-align: right; margin-top: 10px;">
-      <button class="btn-loot-all" onclick="lootAllItemsFromChest()">🎒 全部拾取 (TAKE ALL)</button>
-      <button class="btn-loot-close" onclick="closeLootUI()">離開箱子</button>
-    </div>
-  </div>
-
-  <!-- 5. 死亡重構 -->
-  <div id="death-screen" class="death-overlay hidden">
-    <div class="glitch-title">時空架構崩潰</div>
-    <button class="btn-aaa btn-respawn" onclick="triggerPlayerRespawn()">🌀 重新動態初始化</button>
-  </div>
-
-  <!-- 6. 按鍵控制中心 -->
-  <div id="settings-popup" class="glass-popup hidden">
-    <div class="popup-title">⚙️ 核心矩陣按鍵綁定</div>
-    <div class="settings-grid">
-      <div class="setting-row"><span>向上移動:</span><button id="btn-bind-UP" onclick="startRebind('UP')">W</button></div>
-      <div class="setting-row"><span>向下移動:</span><button id="btn-bind-DOWN" onclick="startRebind('DOWN')">S</button></div>
-      <div class="setting-row"><span>向左移動:</span><button id="btn-bind-LEFT" onclick="startRebind('LEFT')">A</button></div>
-      <div class="setting-row"><span>向右移動:</span><button id="btn-bind-RIGHT" onclick="startRebind('RIGHT')">D</button></div>
-      <div class="setting-row"><span>普通斬擊:</span><button id="btn-bind-ATTACK" onclick="startRebind('ATTACK')">Space</button></div>
-      <div class="setting-row"><span>開啟箱子:</span><button id="btn-bind-LOOT" onclick="startRebind('LOOT')">Y</button></div>
-    </div>
-    <button class="btn-close" onclick="toggleMenuPanel('settings-popup')">保存設定</button>
-  </div>
-
 </div>
-    <script  src="./script.js"></script>
 
-  </body>
-  
+<script src="game.js"></script>
+</body>
 </html>
