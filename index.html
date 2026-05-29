@@ -9,43 +9,134 @@
   </head>
     
   <body>
-  <!-- 1. 攔截匹配的排隊彈窗 (可放置於 lobby-container 內) -->
-<div id="matchmaking-modal" class="hidden">
-  <div class="match-spinner"></div>
-  <div class="match-status">正在搜尋對手...</div>
-  <div id="match-timer">00:00</div>
-  <button class="btn-core" onclick="Engine.cancelMatchmaking()">取消匹配</button>
-</div>
+  <html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quantum Engine 10.0 - Ultima Final Edition</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-<!-- 2. 修改或擴充你原本的 hud-top (結合特戰英豪 1v1 ~ 5v5 動態頭像) -->
-<div id="custom-game-hud" class="hidden">
-  <!-- 藍方隊伍頭像區 (動態生成) -->
-  <div class="hud-team-avatars team-blue" id="hud-avatars-blue"></div>
-  
-  <!-- 中央比分板 -->
-  <div class="hud-score-center">
-    <span id="hud-score-blue" class="score-num blue-text">0</span>
-    <span class="score-divider">:</span>
-    <span id="hud-score-red" class="score-num red-text">0</span>
-  </div>
-  
-  <!-- 紅方隊伍頭像區 (動態生成) -->
-  <div class="hud-team-avatars team-red" id="hud-avatars-red"></div>
-</div>
+<div class="game-universe">
+    <div class="scanlines"></div>
 
-<!-- 3. 精緻帥氣的牌位升級動畫全螢幕覆蓋層 -->
-<div id="rank-upgrade-overlay" class="hidden">
-  <div class="rank-glow-burst"></div>
-  <div class="rank-card-animate">
-    <div class="metallic-shine"></div>
-    <div class="rank-subtitle">RANK UP</div>
-    <div class="rank-icon-spark">✦</div>
-    <div class="rank-tier-text">神話特務 III (RADIANT)</div>
-    <div class="rank-bar-container">
-      <div class="rank-bar-fill"></div>
+    <div id="ui-main-menu" class="overlay-screen">
+        <h1 class="glitch-text">QUANTUM 10.0</h1>
+        <p class="sub-title">ULTIMA CHAMPIONSHIP · 終極競技版</p>
+        
+        <div class="lobby-container">
+            <div class="menu-panel">
+                <div class="player-info-badge">
+                    <div class="info-row"><span>玩家暱稱:</span> <input type="text" id="input-name" value="無情揮刀手"></div>
+                    <div class="info-row"><span>排位 ELO:</span> <span id="lobby-elo" class="neon-gold">1200</span></div>
+                    <div class="info-row"><span>目前段位:</span> <span id="lobby-rank" class="neon-cyan">青銅戰將 III</span></div>
+                </div>
+
+                <div class="skill-equip-zone">
+                    <div class="zone-title">🛠️ 主動技能裝備配置 (最多選2個)</div>
+                    <div id="skill-selector-grid" class="selector-grid"></div>
+                </div>
+
+                <div class="control-row-btns">
+                    <button class="btn-core mode-device" id="btn-toggle-device" onclick="Engine.toggleDevice()">💻 模式：PC 鍵盤</button>
+                    <button onclick="Engine.toggleShop(true)" class="btn-core btn-shop-gold">🛍️ 核心母艦物資庫</button>
+                    <button onclick="Engine.toggleSettings(true)" class="btn-core">⚙️ 系統組態設定</button>
+                </div>
+                
+                <hr class="ui-hr">
+                <div class="mode-grid">
+                    <button class="btn-core mode-training" onclick="Engine.launch('TRAINING')">🎯 虛擬靶場 (無倒數/不扣血)</button>
+                    <button class="btn-core mode-ranked" onclick="Engine.launch('RANKED_1V1')">👑 1v1 巔峰排位賽</button>
+                    <button class="btn-core mode-ranked" onclick="Engine.launch('RANKED_2V2')">👑 2v2 星際排位賽</button>
+                    <button class="btn-core mode-ranked" onclick="Engine.launch('RANKED_3V3')">👑 3v3 星雲排位賽</button>
+                    <button class="btn-core mode-pvp" onclick="Engine.launch('PVP_4V4')">🌌 4v4 戰術匹配賽</button>
+                    <button class="btn-core mode-pvp" onclick="Engine.launch('PVP_5V5')">🏆 5v5 巔峰死鬥賽</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <div id="ui-game-viewport" class="hidden">
+        <div class="hud-top">
+            <div class="hud-block"><span>聯賽模式:</span> <span id="hud-mode-name">---</span></div>
+            <div class="hud-block"><span>戰績(K/D):</span> <span id="hud-kda">0 / 0</span></div>
+            <div class="hud-block"><span id="hud-star-coins">💰 0</span></div>
+            <button onclick="Engine.exitGame()" class="btn-quit">🚪 脫離戰場</button>
+        </div>
+
+        <div class="player-vital-panel">
+            <div class="vital-row">
+                <span class="vital-label">HP</span>
+                <div class="bar-frame"><div id="bar-hp" class="bar-fill hp-fill"></div></div>
+            </div>
+            <div class="vital-row">
+                <span class="vital-label">MP</span>
+                <div class="bar-frame"><div id="bar-mp" class="bar-fill mp-fill"></div></div>
+            </div>
+            <div id="spectator-warning" class="spec-banner hidden">👁️ 正在觀戰隊友視角 (WASD 切換)</div>
+        </div>
+
+        <div class="main-battlefield">
+            <canvas id="gameCanvas"></canvas>
+            
+            <div id="ui-countdown-mask" class="center-overlay hidden">
+                <div id="txt-countdown" class="countdown-text">READY</div>
+            </div>
+
+            <div id="mobile-ui" class="hidden">
+                <div class="joystick-zone" id="joy-zone"><div class="joystick-knob" id="joy-knob"></div></div>
+                <div class="action-zone" id="mobile-action-zone">
+                    <div class="btn-mobile-action" id="mb-btn-s1" ontouchstart="Engine.cast(0)">S1<div class="cd-overlay" id="mcd-s0"></div></div>
+                    <div class="btn-mobile-action" id="mb-btn-s2" ontouchstart="Engine.cast(1)">S2<div class="cd-overlay" id="mcd-s1"></div></div>
+                    <div class="btn-mobile-action" id="mb-btn-shift" ontouchstart="Engine.cast('Shift')">閃<div class="cd-overlay" id="mcd-shift"></div></div>
+                    <div class="btn-mobile-action atk" ontouchstart="Engine.attack()">⚔️</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="pc-footer" class="pc-footer hidden">
+            <div class="skill-slot"><span class="key-cap">Space</span> <span>⚔️ 基礎斬擊</span></div>
+            <div class="skill-slot" id="pc-slot-shift"><span class="key-cap">Shift</span> <span>⚡ 量子閃現</span> <div class="cd-overlay" id="pcd-shift"></div></div>
+            <div class="skill-slot" id="pc-slot-s0"><span class="key-cap">Q</span> <span id="label-pc-s0">未裝備</span> <div class="cd-overlay" id="pcd-s0"></div></div>
+            <div class="skill-slot" id="pc-slot-s1"><span class="key-cap">E</span> <span id="label-pc-s1">未裝備</span> <div class="cd-overlay" id="pcd-s1"></div></div>
+        </div>
+    </div>
+
+    <div id="ui-settlement-screen" class="overlay-screen hidden">
+        <div class="settlement-box">
+            <h2 id="settle-title" class="settle-banner-text">VICTORY</h2>
+            
+            <div class="elo-animate-container">
+                <div class="rank-icon-wrapper" id="settle-rank-icon">🔮</div>
+                <div class="elo-details">
+                    <div id="settle-rank-name" class="rank-title">青銅戰將 III</div>
+                    <div class="elo-bar-bg"><div id="settle-elo-bar" class="elo-bar-fill"></div></div>
+                    <div class="elo-score-text">ELO Rating: <span id="settle-elo-old">1200</span> <span id="settle-elo-delta" class="neon-green">+25</span> → <span id="settle-elo-new">1225</span></div>
+                </div>
+            </div>
+
+            <div class="card-reveal-section">
+                <div class="section-title">🎁 戰役量子解碼：請挑選一張物資卡牌翻開</div>
+                <div class="cards-wrapper">
+                    <div class="quantum-card" onclick="Engine.revealCard(0, this)"><div class="card-inner"><div class="card-front">?</div><div class="card-back" id="card-back-0">💰 +50</div></div></div>
+                    <div class="quantum-card" onclick="Engine.revealCard(1, this)"><div class="card-inner"><div class="card-front">?</div><div class="card-back" id="card-back-1">💰 +10</div></div></div>
+                    <div class="quantum-card" onclick="Engine.revealCard(2, this)"><div class="card-inner"><div class="card-front">?</div><div class="card-back" id="card-back-2">💰 +25</div></div></div>
+                </div>
+            </div>
+
+            <button onclick="Engine.closeSettlement()" class="btn-core btn-continue-lobby">返回母艦大廳</button>
+        </div>
+    </div>
+
+    <div id="skin-shop-modal" class="modal-window hidden"></div>
+
+    <div id="settings-modal" class="modal-window hidden"></div>
 </div>
+
+<script src="script.js"></script>
+</body>
+</html>
     <script  src="./script.js"></script>
 
   </body>
